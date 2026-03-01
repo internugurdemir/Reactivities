@@ -484,3 +484,5 @@ API/appsettings.json
 API/reactivities.db
 CourseAssets/CourseAssets.zip
 CourseAssets
+API/reactivities.db-shm
+API/reactivities.db-wal
