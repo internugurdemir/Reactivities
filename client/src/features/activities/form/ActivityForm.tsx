@@ -43,7 +43,7 @@ export default function ActivityForm() {
                 <TextField name='title' label='Title'               defaultValue={activity?.title || ''} />
                 <TextField name='description' label='Description'   defaultValue={activity?.category || ''} multiline rows={3} />
                 <TextField name='category'                          defaultValue={activity?.category || ''} label='Category' />
-              <TextField name='date' defaultValue={activity?.date
+                <TextField name='date' defaultValue={activity?.date
                     ? new Date(activity.date).toISOString().split('T')[0]
                     : new Date().toISOString().split('T')[0]}
                     label='Date' type="date"
