@@ -1,5 +1,9 @@
 using System;
+using Application.Activities.DTOs;
+using Application.Core;
+using AutoMapper;
 using Domain;
+using FluentValidation;
 using MediatR;
 using Persistence;
 
@@ -18,9 +22,9 @@ public class CreateActivity
         The Return Type: IRequest<string> means that once this command is finished, 
                     it will send back a string (in this case, the ID of the new activity).
     */
-    public class Command : IRequest<string>
+    public class Command : IRequest<Result<string>>
     {
-        public required Activity Activity { get; set; }
+        public required CreateActivityDto ActivityDto { get; set; }
     }
 /*
             The Worker: This is the class that actually does the heavy lifting.
@@ -29,19 +33,20 @@ public class CreateActivity
                         It doesn't know how the database is set up; 
                         it just uses the "injected" version to save data.
 */
-    public class Handler(AppDbContext context) : IRequestHandler<Command, string>
+    public class Handler(AppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<string>>
     {
         /*
             This is pure Business Logic. 
             It takes the data from the "envelope" (request), gives it to the database, and confirms it was saved.
         */
-        public async Task<string> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<string>> Handle(Command request, CancellationToken cancellationToken)
         {
-            context.Activities.Add(request.Activity);
+            var activity = mapper.Map<Activity>(request.ActivityDto);
+            context.Activities.Add(activity);
 
-            await context.SaveChangesAsync(cancellationToken);
-
-            return request.Activity.Id;
+            var result = await context.SaveChangesAsync(cancellationToken)>0;
+            if (!result) return Result<string>.Failure("Failed to create the activity",400); 
+            return Result<string>.Success(activity.Id);
         }
     }
 }
