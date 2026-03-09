@@ -2,6 +2,7 @@ using System;
 using Application.Activities.Commands;
 using Application.Activities.DTOs;
 using Application.Activities.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

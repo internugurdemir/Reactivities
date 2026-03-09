@@ -32,5 +32,5 @@ Use Case: Use this for function arguments, component props, and state variables 
 
 Transformations: If you transform a string to a Date, z.infer will correctly show the type as Date.
 */
- export type ActivitySchema = z.input<typeof activitySchema>;
-//export type ActivitySchema = z.infer<typeof activitySchema>;
+ //export type ActivitySchema = z.input<typeof activitySchema>;
+export type ActivitySchema = z.infer<typeof activitySchema>;
