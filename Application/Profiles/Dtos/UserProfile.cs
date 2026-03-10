@@ -1,6 +1,6 @@
 using System;
 
-namespace Application.Profiles.DTOs;
+namespace Application.Profiles.Dtos;
 
 public class UserProfile
 {

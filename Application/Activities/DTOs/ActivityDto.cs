@@ -1,5 +1,5 @@
 using System;
-using Application.Profiles.DTOs;
+using Application.Profiles.Dtos;
 
 namespace Application.Activities.DTOs;
 

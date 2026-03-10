@@ -6,6 +6,7 @@ using Application.Core;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -45,7 +46,9 @@ builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 //A new instance is created every time it is requested.
 //If two different classes need this service, they each get a brand new copy.
 builder.Services.AddTransient<ExceptionMiddleware>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 /*
 Transient	Every single time.	Small, fast, independent tools.
 Scoped	Once per web request.	Database work and User data.
