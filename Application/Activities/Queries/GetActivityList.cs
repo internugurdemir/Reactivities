@@ -1,4 +1,7 @@
 using System;
+using Application.Activities.DTOs;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +20,7 @@ public class GetActivityList
                                         they expect a list of Activities back."
 
     */
-    public class Query : IRequest<List<Activity>> { }
+    public class Query : IRequest<List<ActivityDto>> { }
 /*
     This is the Interface Adapter or Use Case logic.
 
@@ -28,7 +31,7 @@ public class GetActivityList
     It implements IRequestHandler, which is the contract saying: 
                         "I know how to handle the Query and return the List<Activity>."
 */
-    public class Handler(AppDbContext context) : IRequestHandler<Query, List<Activity>>
+    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, List<ActivityDto>>
     {
 
         /*
@@ -38,10 +41,12 @@ public class GetActivityList
         Isolation: This handler doesn't know if the request came from 
                         a Web API, a Mobile App, or a Test. It just knows it needs to return activities. 
         */
-        public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<List<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-
-            return await context.Activities.ToListAsync(CancellationToken.None);
+                
+            return await context.Activities
+                                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                                .ToListAsync(CancellationToken.None);
         }
     }
 }

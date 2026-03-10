@@ -1,6 +1,7 @@
 using System;
 using Application.Activities.DTOs;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using Domain;
 using FluentValidation;
@@ -26,14 +27,14 @@ public class CreateActivity
     {
         public required CreateActivityDto ActivityDto { get; set; }
     }
-/*
-            The Worker: This is the class that actually does the heavy lifting.
+    /*
+                The Worker: This is the class that actually does the heavy lifting.
 
-            Dependency Injection: It asks for AppDbContext. 
-                        It doesn't know how the database is set up; 
-                        it just uses the "injected" version to save data.
-*/
-    public class Handler(AppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<string>>
+                Dependency Injection: It asks for AppDbContext. 
+                            It doesn't know how the database is set up; 
+                            it just uses the "injected" version to save data.
+    */
+    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Command, Result<string>>
     {
         /*
             This is pure Business Logic. 
@@ -41,11 +42,23 @@ public class CreateActivity
         */
         public async Task<Result<string>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var user = await userAccessor.GetUserAsync();
             var activity = mapper.Map<Activity>(request.ActivityDto);
             context.Activities.Add(activity);
 
-            var result = await context.SaveChangesAsync(cancellationToken)>0;
-            if (!result) return Result<string>.Failure("Failed to create the activity",400); 
+
+            var attendee = new ActivityAttendee
+            {
+                ActivityId = activity.Id,
+                UserId = user.Id,
+                IsHost = true
+            };
+
+            activity.Attendees.Add(attendee);
+
+
+            var result = await context.SaveChangesAsync(cancellationToken) > 0;
+            if (!result) return Result<string>.Failure("Failed to create the activity", 400);
             return Result<string>.Success(activity.Id);
         }
     }

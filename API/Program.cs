@@ -3,8 +3,10 @@ using Application.Activities.Commands;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -38,14 +40,31 @@ builder.Services.AddMediatR
 
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
+//A new instance is created once per HTTP request.
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+//A new instance is created every time it is requested.
+//If two different classes need this service, they each get a brand new copy.
 builder.Services.AddTransient<ExceptionMiddleware>();
+
+/*
+Transient	Every single time.	Small, fast, independent tools.
+Scoped	Once per web request.	Database work and User data.
+Singleton	Only once (when the app starts).	Global settings or Caching.
+*/
 builder.Services.AddIdentityApiEndpoints<User>(opt =>
     {
         opt.User.RequireUniqueEmail = true;
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
-
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("IsActivityHost", policy => 
+    {
+        policy.Requirements.Add(new IsHostRequirement());
+    });
+});
+builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
