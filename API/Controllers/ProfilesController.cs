@@ -40,4 +40,9 @@ public class ProfilesController : BaseApiController
     }
 
 
+    [HttpPut]
+    public async Task<ActionResult> UpdateProfile(EditProfile.Command command)
+    {
+        return HandleResult(await Mediator.Send(command));
+    }
 }
