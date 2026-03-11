@@ -17,4 +17,5 @@ public class Activity
 
 
     public ICollection<ActivityAttendee> Attendees { get; set; } = [];
+    public ICollection<Comment> Comments { get; set; } = [];
 }
