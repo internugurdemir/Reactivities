@@ -1,5 +1,6 @@
 using System;
 using Application.Activities.DTOs;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
@@ -31,7 +32,7 @@ public class GetActivityList
     It implements IRequestHandler, which is the contract saying: 
                         "I know how to handle the Query and return the List<Activity>."
 */
-    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, List<ActivityDto>>
+    public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, List<ActivityDto>>
     {
 
         /*
@@ -45,7 +46,8 @@ public class GetActivityList
         {
                 
             return await context.Activities
-                                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider
+                                    , new { currentUserId = userAccessor.GetUserId() })
                                 .ToListAsync(CancellationToken.None);
         }
     }

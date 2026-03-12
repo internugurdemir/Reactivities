@@ -2,6 +2,7 @@
 using System;
 using Application.Activities.DTOs;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
@@ -18,7 +19,10 @@ public class GetActivityDetails
         public required string Id { get; set; }
     }
 
-    public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<ActivityDto>>
+    public class Handler(AppDbContext context, 
+                         IMapper mapper,
+                         IUserAccessor userAccessor
+                         ) : IRequestHandler<Query, Result<ActivityDto>>
     {
         public async Task<Result<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -108,7 +112,8 @@ Result: Multiple trips to the database (The "N+1" problem).
       ORDER BY "a6"."Id", "s"."ActivityId", "s"."UserId"
             */
             var activity = await context.Activities
-                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider,
+                    new { currentUserId = userAccessor.GetUserId() })
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
                 
             if(activity==null) return Result<ActivityDto>.Failure("Activity not found",404);
