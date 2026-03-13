@@ -21,22 +21,12 @@ agent.interceptors.request.use(config => {
 
 agent.interceptors.response.use(
     async response => {
-            // try {
-            //     await sleep(1000);
-            //     return response;
-            // } catch (error) {
-            //     console.log('axios error' + error);
-            //     return Promise.reject(error);
-            // }finally {
-            //     store.uiStore.isIdle();
-            // }
-        ////instead of try catch:
-        await sleep(1000);
+        if (import.meta.env.DEV) await sleep(1000);
         store.uiStore.isIdle();
         return response;
        },
     async error => {
-        await sleep(1000);
+        if (import.meta.env.DEV) await sleep(1000);
         store.uiStore.isIdle(); // Ensure the busy state is reset on error
         const {data, status} = error.response;
         switch (status) {

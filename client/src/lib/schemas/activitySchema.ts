@@ -1,21 +1,20 @@
 import {z} from 'zod';
-
-const requiredString = (fieldName: string) => z.string({error: `${fieldName} is required`}).min(1, 
-                                                                {error: `${fieldName} is required`})
+import { requiredString } from '../util/util';
 
 export const activitySchema = z.object({
-
     title: requiredString('Title'),
     description: requiredString('Description'),
     category: requiredString('Category'),
     date: z.coerce.date({error: 'Date is required'}),
     location: z.object({
         venue: requiredString('Venue'),
-        city: z.string().optional(),
+        city: z.string(),
         latitude: z.coerce.number(),
         longitude: z.coerce.number()
     })
 })
+
+export type ActivitySchema = z.input<typeof activitySchema>;
 
 /*
 1. z.input<typeof schema>
@@ -32,5 +31,3 @@ Use Case: Use this for function arguments, component props, and state variables 
 
 Transformations: If you transform a string to a Date, z.infer will correctly show the type as Date.
 */
- //export type ActivitySchema = z.input<typeof activitySchema>;
-export type ActivitySchema = z.infer<typeof activitySchema>;

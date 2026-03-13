@@ -6,4 +6,4 @@ export const editProfileSchema = z.object({
     bio: z.string().optional()
 });
 
-export type EditProfileSchema = z.infer<typeof editProfileSchema>;
+export type EditProfileSchema = z.input<typeof editProfileSchema>;

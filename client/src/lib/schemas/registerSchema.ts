@@ -7,4 +7,4 @@ export const registerSchema = z.object({
     password: requiredString('Password')
 });
 
-export type RegisterSchema = z.infer<typeof registerSchema>;
+export type RegisterSchema = z.input<typeof registerSchema>;
